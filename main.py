@@ -1,16 +1,8 @@
-from validation.filename_check import filename_check
+from validation.filenames_valid import filenames_valid
 
 def main():
-    print("🔍 Checking dataset filenames...")
-    ok = filename_check("in_the_wild_faces") # pass dataset dir here
-
-    if not ok:
-        print("❌ Dataset filename check failed. Stopping program.")
+    if not filenames_valid(dataset_dir = "in_the_wild_faces"):
         return
-
-    print("✅ Dataset filename check passed. Continuing with training pipeline...")
-    # === Your ML code continues here ===
-    # e.g., train_test_split, DataLoader, training loop, etc.
 
 if __name__ == "__main__":
     main()
