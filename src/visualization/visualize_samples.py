@@ -9,7 +9,7 @@ def show_samples(image_paths, n):
         img_raw = tf.io.read_file(str(path))
         img = tf.image.decode_jpeg(img_raw, channels=3)
         images.append((path, img))
-
+#asdf
     plt.figure(figsize=(12, 6))
     for i, (path, img) in enumerate(images):
         plt.subplot(1, len(images), i + 1)
