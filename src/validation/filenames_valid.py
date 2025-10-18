@@ -15,13 +15,14 @@ UTKFace format:
 # Initially 10 false entries were detected. Those were manually repaired.
 # During repairs discovered a mistake in labeling (white person given false race label).
 # --> Could be a wider spread problem.
+
+pattern = re.compile(r"^(\d{1,3})_(0|1)_[0-4]_\d{17}\.jpg$")
+
 def filenames_valid(dataset_dir):
     print("🔍 Checking dataset filenames...")
     dataset_dir = Path(dataset_dir)
     if not dataset_dir.is_absolute():
         dataset_dir = (Path(__file__).resolve().parent.parent / dataset_dir).resolve()
-
-    pattern = re.compile(r"^(\d{1,3})_(0|1)_[0-4]_\d{17}\.jpg$")
 
     invalid, valid = [], 0
 
@@ -40,7 +41,7 @@ def filenames_valid(dataset_dir):
         print(f"❌ {count} invalid {noun} detected:")
         for f in invalid:
             print(f"  {f.name}")
-        return False
+        return
     else:
         print("🎉 All files follow the UTKFace naming format.")
-        return True
+        return
