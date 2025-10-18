@@ -17,24 +17,28 @@ UTKFace format:
 # --> Could be a wider spread problem.
 def filenames_valid(dataset_dir):
     print("🔍 Checking dataset filenames...")
-    dataset_dir = Path(__file__).resolve().parent.parent / dataset_dir
+    dataset_dir = Path(dataset_dir)
+    if not dataset_dir.is_absolute():
+        dataset_dir = (Path(__file__).resolve().parent.parent / dataset_dir).resolve()
+
     pattern = re.compile(r"^(\d{1,3})_(0|1)_[0-4]_\d{17}\.jpg$")
 
-    invalid_files = []
-    valid_count = 0
+    invalid, valid = [], 0
 
     for p in dataset_dir.rglob("*"):
         if p.is_file():
             if pattern.match(p.name):
-                valid_count += 1
+                valid += 1
             else:
-                invalid_files.append(p)
+                invalid.append(p)
 
-    print(f"✅ {valid_count} valid filenames found.")
+    print(f"✅ {valid} valid filenames found.")
 
-    if invalid_files:
-        print(f"❌ {len(invalid_files)} invalid filenames detected:")
-        for f in invalid_files:
+    if invalid:
+        count = len(invalid)
+        noun = "filename" if count == 1 else "filenames"
+        print(f"❌ {count} invalid {noun} detected:")
+        for f in invalid:
             print(f"  {f.name}")
         return False
     else:
