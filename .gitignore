@@ -1,1 +1,19 @@
-.idea/
+# PyCharm
+.idea
+
+# Byte-compiled / cache files
+__pycache__/
+*.py[cod]
+
+# Virtual environments
+.venv/
+.env/
+
+# TensorFlow / training artifacts
+*.h5
+*.ckpt
+*.log
+
+# OS metadata
+.DS_Store
+Thumbs.db
