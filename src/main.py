@@ -22,6 +22,7 @@ def main():
 
     image_paths = get_image_paths(DATASET_DIR)
     show_samples(image_paths, 5)
+    image_labels = parse_labels(image_paths)
 
 if __name__ == "__main__":
     main()
