@@ -6,7 +6,7 @@ os.environ["TF_CPP_MIN_LOG_LEVEL"] = "2"
 
 from data_loading.load_images import get_image_paths
 from preprocessing.build_datasets import build_splits#, make_dataset
-from preprocessing.labels import parse_age
+from preprocessing.parse_age import parse_age
 from validation.filenames_valid import filenames_valid
 from visualization.visualize_samples import show_samples
 
@@ -28,7 +28,6 @@ def main():
     # Split dataset
     (X_train, y_train), (X_val, y_val), (X_test, y_test) = build_splits(image_paths, age_labels)
 
-    print(X_train, y_train)
     """ UNDER CONSTRUCTION
     # Create tf.data.Dataset objects
     train_ds = make_dataset(X_train, y_train, training=True)
