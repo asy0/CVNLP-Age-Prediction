@@ -40,7 +40,7 @@ def main():
     val   : (2411, 2411)...  10% of data
     test  : (2411, 2411)...  10% of data
     """
-    (X_train, y_train), (X_val, y_val), (X_test, y_test) = build_splits(image_paths, age_labels)
+    (x_train, y_train), (x_val, y_val), (x_test, y_test) = build_splits(image_paths, age_labels)
 
     """
     Convert splits into TensorFlow Datasets (tf.data.Dataset)
@@ -58,9 +58,9 @@ def main():
     3 channels (RGB)
     32 batchsize, age labels
     """
-    train_ds = make_tf_dataset(X_train, y_train, training=True)
-    val_ds = make_tf_dataset(X_val, y_val)
-    test_ds = make_tf_dataset(X_test, y_test)
+    train_ds = make_tf_dataset(x_train, y_train, training=True)
+    val_ds = make_tf_dataset(x_val, y_val)
+    test_ds = make_tf_dataset(x_test, y_test)
 
 if __name__ == "__main__":
     main()
