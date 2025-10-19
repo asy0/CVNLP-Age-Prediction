@@ -34,7 +34,7 @@ def main():
     store 
     (['SYSTEM:/PROJECT_ROOT/in_the_wild_faces/first.jpg', ..., 'SYSTEM:/PROJECT_ROOT/in_the_wild_faces/last.jpg'] 
     [age_1, age_2, ..., age_n]) 
-    in 3 splits. Training, Validation, Testing.
+    in 3 splits: Training, Validation, Testing.
     amount of values stored:
     train : (19286, 19286)... 80% of data
     val   : (2411, 2411)...  10% of data
