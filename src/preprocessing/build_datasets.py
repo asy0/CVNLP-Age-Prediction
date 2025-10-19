@@ -16,15 +16,15 @@ def build_splits(image_paths: List[Path], ages: List[int], test_size=0.1, val_si
 
     age_bins = np.digitize(ages, AGE_BINS, right=False)
 
-    X_train_val, X_test, y_train_val, y_test, bins_train_val, bins_test = train_test_split(
+    x_train_val, x_test, y_train_val, y_test, bins_train_val, bins_test = train_test_split(
         image_paths, ages, age_bins, test_size=test_size, random_state=SEED, stratify=age_bins
     )
 
     val_ratio = val_size / (1 - test_size)
-    X_train, X_val, y_train, y_val = train_test_split(
-        X_train_val, y_train_val, test_size=val_ratio, random_state=SEED, stratify=bins_train_val
+    x_train, x_val, y_train, y_val = train_test_split(
+        x_train_val, y_train_val, test_size=val_ratio, random_state=SEED, stratify=bins_train_val
     )
-    return (X_train, y_train), (X_val, y_val), (X_test, y_test)
+    return (x_train, y_train), (x_val, y_val), (x_test, y_test)
 
 # Image preprocessing for TensorFlow
 def preprocess_image(path: tf.Tensor) -> tf.Tensor:
