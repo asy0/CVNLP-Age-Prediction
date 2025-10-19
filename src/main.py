@@ -4,7 +4,7 @@ from pathlib import Path
 # Silence Tensorflow INFO and WARNING, leave ERROR
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "2"
 
-from data_loading.load_images import get_image_paths
+from data_loading.get_image_paths import get_image_paths
 from preprocessing.build_datasets import build_splits, make_tf_dataset
 from preprocessing.parse_age import parse_age
 from validation.filenames_valid import filenames_valid

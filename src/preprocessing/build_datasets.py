@@ -26,7 +26,6 @@ def build_splits(image_paths: List[Path], ages: List[int], test_size=0.1, val_si
     )
     return (x_train, y_train), (x_val, y_val), (x_test, y_test)
 
-# Image preprocessing for TensorFlow
 def preprocess_image(path: tf.Tensor) -> tf.Tensor:
     img = tf.io.read_file(path)
     img = tf.image.decode_jpeg(img, channels=3)
