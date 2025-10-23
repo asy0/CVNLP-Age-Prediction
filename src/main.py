@@ -5,6 +5,7 @@ from pathlib import Path
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "2"
 
 from data_loading.get_image_paths import get_image_paths
+from model.model import build_model
 from preprocessing.build_datasets import build_splits, make_tf_dataset
 from preprocessing.parse_age import parse_age
 from validation.filenames_valid import filenames_valid
@@ -61,6 +62,61 @@ def main():
     train_ds = make_tf_dataset(x_train, y_train, training=True)
     val_ds = make_tf_dataset(x_val, y_val)
     test_ds = make_tf_dataset(x_test, y_test)
+
+    """
+    Build the model
+    - A 3×3 filter (kernel) scans the image and computes pattern activations at each layer
+    - After each Conv Layer, a 2×2 MaxPool halves width/height (keeps strongest responses).
+    
+    Input Layer: (128 Pixels, 128 Pixels, 3 channels - RGB) -   the image
+    
+    Conv Layer 1: (126 Features, 126 Features, 32 Filters)  -   Filters are small scanning grids that detect patterns
+    Conv Layer 2: (61 Features, 61 Features, 64 Filters)    -   Features are detected patterns from previous layers
+    Conv Layer 3: (28 Features, 28 Features, 128 Filters)
+    
+    Flatten Layer: (14×14×128 = 25,088 features)    -   Just a 1D Array version of the same information
+    
+    2 Dense Layer: Combine all learned features to find complex relationships
+    2 Dropouts: Random Deactivation of Neurons during training to reduce overfitting
+    
+    Output Layer: 1 Neuron, Age Prediction
+    .
+    .
+    .
+    model.summary() ->
+    Model: "sequential"
+    ┌─────────────────────────────────┬────────────────────────┬───────────────┐
+    │ Layer (type)                    │ Output Shape           │       Param # │
+    ├─────────────────────────────────┼────────────────────────┼───────────────┤
+    │ conv2d (Conv2D)                 │ (None, 126, 126, 32)   │           896 │
+    ├─────────────────────────────────┼────────────────────────┼───────────────┤
+    │ max_pooling2d (MaxPooling2D)    │ (None, 63, 63, 32)     │             0 │
+    ├─────────────────────────────────┼────────────────────────┼───────────────┤
+    │ conv2d_1 (Conv2D)               │ (None, 61, 61, 64)     │        18,496 │
+    ├─────────────────────────────────┼────────────────────────┼───────────────┤
+    │ max_pooling2d_1 (MaxPooling2D)  │ (None, 30, 30, 64)     │             0 │
+    ├─────────────────────────────────┼────────────────────────┼───────────────┤
+    │ conv2d_2 (Conv2D)               │ (None, 28, 28, 128)    │        73,856 │
+    ├─────────────────────────────────┼────────────────────────┼───────────────┤
+    │ max_pooling2d_2 (MaxPooling2D)  │ (None, 14, 14, 128)    │             0 │
+    ├─────────────────────────────────┼────────────────────────┼───────────────┤
+    │ flatten (Flatten)               │ (None, 25088)          │             0 │
+    ├─────────────────────────────────┼────────────────────────┼───────────────┤
+    │ dense (Dense)                   │ (None, 128)            │     3,211,392 │
+    ├─────────────────────────────────┼────────────────────────┼───────────────┤
+    │ dropout (Dropout)               │ (None, 128)            │             0 │
+    ├─────────────────────────────────┼────────────────────────┼───────────────┤
+    │ dense_1 (Dense)                 │ (None, 64)             │         8,256 │
+    ├─────────────────────────────────┼────────────────────────┼───────────────┤
+    │ dropout_1 (Dropout)             │ (None, 64)             │             0 │
+    ├─────────────────────────────────┼────────────────────────┼───────────────┤
+    │ age_output (Dense)              │ (None, 1)              │            65 │
+    └─────────────────────────────────┴────────────────────────┴───────────────┘
+     Total params: 3,312,961 (12.64 MB)
+     Trainable params: 3,312,961 (12.64 MB)
+     Non-trainable params: 0 (0.00 B)
+    """
+    model = build_model()
 
 if __name__ == "__main__":
     main()
