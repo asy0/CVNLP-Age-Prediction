@@ -1,9 +1,10 @@
 import os
-from pathlib import Path
 
 # Silence Tensorflow INFO and WARNING, leave ERROR
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "2"
+import tensorflow as tf
 
+from pathlib import Path
 from data_loading.get_image_paths import get_image_paths
 from model.model import build_model
 from preprocessing.build_datasets import build_splits, make_tf_dataset
@@ -13,6 +14,7 @@ from visualization.visualize_samples import show_samples
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 DATASET_DIR  = PROJECT_ROOT / "in_the_wild_faces"
+ARTIFACTS_DIR = PROJECT_ROOT / "artifacts"
 
 def main():
     """
@@ -45,6 +47,7 @@ def main():
 
     """
     Convert splits into TensorFlow Datasets (tf.data.Dataset)
+    More efficient for training by creating batches of data
                                                       images         age
     train_ds : (_PrefetchDataset) 603 batches of (32, 128, 128, 3), (32,)
     val_ds   : (_PrefetchDataset) 76  batches of (32, 128, 128, 3), (32,)
@@ -117,6 +120,35 @@ def main():
      Non-trainable params: 0 (0.00 B)
     """
     model = build_model()
+
+    """
+    EarlyStopping: If no improvement after 5 epochs, the model is stopped. Best Version is saved.
+    ReduceLROnPlateau: Reduce learning rate if validation error is not improving for 2 epochs.
+    ModelCheckpoint: Save Copy of model each time validation MAE improves.
+    """
+    ckpt_path = ARTIFACTS_DIR / "best_model_version.keras"
+    callbacks = [
+        tf.keras.callbacks.EarlyStopping(monitor="val_mae", patience=6, restore_best_weights=True),
+        tf.keras.callbacks.ReduceLROnPlateau(monitor="val_mae", factor=0.5, patience=2, min_lr=1e-6),
+        tf.keras.callbacks.ModelCheckpoint(filepath=str(ckpt_path), monitor="val_mae", save_best_only=True)
+    ]
+
+    """
+    model training with 30 runs (epochs)
+    
+    """
+    history = model.fit(
+        train_ds,
+        validation_data=val_ds,
+        epochs=30,
+        callbacks=callbacks,
+    )
+
+    """
+    Saving final model
+    """
+    final_path = ARTIFACTS_DIR / "final_model_version.keras"
+    model.save(final_path)
 
 if __name__ == "__main__":
     main()
