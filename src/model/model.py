@@ -22,7 +22,7 @@ def build_model() -> tf.keras.Model:
         layers.Dropout(0.3),
 
         # --- Output layer ---
-        layers.Dense(1, activation='linear', name="Age Prediction")
+        layers.Dense(1, activation='linear', name="age_prediction")
     ])
 
     # Compile for regression (predict continuous age)
