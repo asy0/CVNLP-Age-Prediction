@@ -134,13 +134,17 @@ def main():
     ]
 
     """
-    model training with 30 runs (epochs)
+    Model training with 50 runs (epochs) or until it gets interrupted by the callbacks.
+    It takes a while, get some coffe! :)
     
+    Each epoch it seems to find Corrupt JPEG data up to two times.
+    We could not think of a way of fixing this issue.
+    The model still fits without a problem.
     """
     history = model.fit(
         train_ds,
         validation_data=val_ds,
-        epochs=30,
+        epochs=50,
         callbacks=callbacks,
     )
 
