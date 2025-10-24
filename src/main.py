@@ -1,4 +1,5 @@
 import os
+import numpy as np
 
 # Silence Tensorflow INFO and WARNING, leave ERROR
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "2"
@@ -15,6 +16,7 @@ from visualization.visualize_samples import show_samples
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 DATASET_DIR  = PROJECT_ROOT / "in_the_wild_faces"
 ARTIFACTS_DIR = PROJECT_ROOT / "artifacts"
+BEST_MODEL = ARTIFACTS_DIR / "best_model_version.keras"
 
 def main():
     """
@@ -153,6 +155,51 @@ def main():
     """
     final_path = ARTIFACTS_DIR / "final_model_version.keras"
     model.save(final_path)
+
+    """
+    If a best model was saved use it, otherwise use the trained in-memory model
+    """
+    if os.path.exists(BEST_MODEL):
+        model.load_weights(BEST_MODEL)
+        print(f"\nLoaded best model checkpoint from: {BEST_MODEL}")
+    else:
+        print("\nNo model checkpoint found — evaluating the current in-memory model.")
+
+    """
+    evaluate the model on test data and show average age prediction error in Years
+    """
+    print("\n=== Test evaluation ===")
+    test_loss, test_mae = model.evaluate(test_ds, verbose=1)
+    print(f"Average age prediction error: {test_mae:.2f} years")
+
+    """
+    collect the true age and predicted age for each image in separate variables
+    """
+    age_true = []
+    for _, age in test_ds.as_numpy_iterator():
+        age_true.append(age)
+    age_true = np.concatenate(age_true).astype(np.float32)
+
+    print("\n=== Age prediction ===")
+    age_pred = model.predict(test_ds, verbose=1).squeeze().astype(np.float32)
+
+    """
+    MSE: Mean Squared Error
+    RMSE: Square root of MSE
+    Bias: Positive value if Model systematically overpredicts or opposite
+    """
+    mse = np.mean((age_pred - age_true) ** 2)
+    rmse = float(np.sqrt(mse))
+    bias = float(np.mean(age_pred - age_true))
+    print(f"\n=== Extra metrics ===\nMSE: {mse:.2f} | RMSE: {rmse:.2f} | Bias (pred-true): {bias:+.2f}")
+
+    """
+    Print all filenames, ture age and predicted age 
+    """
+    print("\nAll predictions:")
+    for i in range(2410):
+        filename = os.path.basename(x_test[i])
+        print(f"{filename}  ->  true: {y_test[i]:5.1f} | pred: {age_pred[i]:5.1f}")
 
 if __name__ == "__main__":
     main()
