@@ -18,6 +18,11 @@ DATASET_DIR  = PROJECT_ROOT / "in_the_wild_faces"
 ARTIFACTS_DIR = PROJECT_ROOT / "artifacts"
 BEST_MODEL = ARTIFACTS_DIR / "best_model_version.keras"
 
+"""
+Set True if you want to train a new model... very time intensive
+"""
+TRAINING_NEW_MODEL = False
+
 def main():
     """
     # run once after every change in "in_the_wild_faces"
@@ -123,47 +128,63 @@ def main():
     """
     model = build_model()
 
-    """
-    EarlyStopping: If no improvement after 5 epochs, the model is stopped. Best Version is saved.
-    ReduceLROnPlateau: Reduce learning rate if validation error is not improving for 2 epochs.
-    ModelCheckpoint: Save Copy of model each time validation MAE improves.
-    """
-    ckpt_path = ARTIFACTS_DIR / "best_model_version.keras"
-    callbacks = [
-        tf.keras.callbacks.EarlyStopping(monitor="val_mae", patience=6, restore_best_weights=True),
-        tf.keras.callbacks.ReduceLROnPlateau(monitor="val_mae", factor=0.5, patience=2, min_lr=1e-6),
-        tf.keras.callbacks.ModelCheckpoint(filepath=str(ckpt_path), monitor="val_mae", save_best_only=True)
-    ]
+    if TRAINING_NEW_MODEL:
+        """
+        EarlyStopping: If no improvement after 5 epochs, the model is stopped. Best Version is saved.
+        ReduceLROnPlateau: Reduce learning rate if validation error is not improving for 2 epochs.
+        ModelCheckpoint: Save Copy of model each time validation MAE improves.
+        """
+        ckpt_path = ARTIFACTS_DIR / "best_model_version.keras"
+        callbacks = [
+            tf.keras.callbacks.EarlyStopping(monitor="val_mae", patience=6, restore_best_weights=True),
+            tf.keras.callbacks.ReduceLROnPlateau(monitor="val_mae", factor=0.5, patience=2, min_lr=1e-6),
+            tf.keras.callbacks.ModelCheckpoint(filepath=str(ckpt_path), monitor="val_mae", save_best_only=True)
+        ]
+
+        """
+        Model training with 50 runs (epochs) or until it gets interrupted by the callbacks.
+        It takes a while, get some coffe! :)
+        
+        Each epoch it seems to find Corrupt JPEG data up to two times.
+        We could not think of a way of fixing this issue.
+        The model still fits without a problem.
+        """
+        history = model.fit(
+            train_ds,
+            validation_data=val_ds,
+            epochs=50,
+            callbacks=callbacks,
+        )
+
+        """
+        Saving final model
+        """
+        final_path = ARTIFACTS_DIR / "final_model_version.keras"
+        model.save(final_path)
 
     """
-    Model training with 50 runs (epochs) or until it gets interrupted by the callbacks.
-    It takes a while, get some coffe! :)
-    
-    Each epoch it seems to find Corrupt JPEG data up to two times.
-    We could not think of a way of fixing this issue.
-    The model still fits without a problem.
-    """
-    history = model.fit(
-        train_ds,
-        validation_data=val_ds,
-        epochs=50,
-        callbacks=callbacks,
-    )
-
-    """
-    Saving final model
-    """
-    final_path = ARTIFACTS_DIR / "final_model_version.keras"
-    model.save(final_path)
-
-    """
-    If a best model was saved use it, otherwise use the trained in-memory model
+    If a best model was saved use it, 
+    otherwise check if a new model was trained, 
+    else exit program
     """
     if os.path.exists(BEST_MODEL):
-        model.load_weights(BEST_MODEL)
-        print(f"\nLoaded best model checkpoint from: {BEST_MODEL}")
-    else:
-        print("\nNo model checkpoint found — evaluating the current in-memory model.")
+        model = tf.keras.models.load_model(BEST_MODEL, compile=True)
+        rel_path = BEST_MODEL.relative_to(PROJECT_ROOT)
+        print(f"Load best model from: {rel_path}")
+
+    else: # check if a new model was trained
+        try:
+            trained_steps = int(tf.keras.backend.get_value(model.optimizer.iterations))
+        except Exception:
+            trained_steps = 0
+
+        if trained_steps > 0:
+            print("No prior model found — continue with the current in-memory model.")
+        else:
+            print("No prior model found & No in-memory model found!!!")
+            print("Set \"TRAINING_NEW_MODEL = True\" for one run at least")
+            print("\nexiting...")
+            return
 
     """
     evaluate the model on test data and show average age prediction error in Years
@@ -191,7 +212,10 @@ def main():
     mse = np.mean((age_pred - age_true) ** 2)
     rmse = float(np.sqrt(mse))
     bias = float(np.mean(age_pred - age_true))
-    print(f"\n=== Extra metrics ===\nMSE: {mse:.2f} | RMSE: {rmse:.2f} | Bias (pred-true): {bias:+.2f}")
+    print("\n=== Extra metrics ===")
+    print(f"MSE: {mse:.2f}")
+    print(f"RMSE: {rmse:.2f}")
+    print(f"Bias (average of(predicted age - true age)): {bias:+.2f}")
 
     """
     Print all filenames, ture age and predicted age 
