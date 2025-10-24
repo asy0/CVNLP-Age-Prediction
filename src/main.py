@@ -12,7 +12,7 @@ from model.build_model import build_model
 from preprocessing.build_datasets import build_splits, make_tf_dataset
 from preprocessing.parse_age import parse_age
 from validation.filenames_valid import filenames_valid
-from visualization.visualize_samples import show_samples
+from visualization.visualize_samples import show_samples, show_results
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 DATASET_DIR  = PROJECT_ROOT / "in_the_wild_faces"
@@ -234,6 +234,8 @@ def main():
     for i in range(2410):
         filename = os.path.basename(x_test[i])
         print(f"{filename}  ->  true: {y_test[i]:5.1f} | pred: {age_pred[i]:5.1f}")
+
+    show_results(x_test, y_test, age_pred, 10)
 
 if __name__ == "__main__":
     main()
