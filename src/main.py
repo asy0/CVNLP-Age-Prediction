@@ -1,3 +1,4 @@
+import argparse
 import os
 import numpy as np
 
@@ -19,9 +20,18 @@ ARTIFACTS_DIR = PROJECT_ROOT / "artifacts"
 BEST_MODEL = ARTIFACTS_DIR / "best_model_version.keras"
 
 """
-Set True if you want to train a new model... very time intensive
+terminal: python src/main.py or PyCharm Play Button:
+ * use saved model
+ * very time efficient
+terminal: python src/main.py --train:
+ * train a new model
+ * takes a lot of time
 """
-TRAINING_NEW_MODEL = False
+parser = argparse.ArgumentParser()
+parser.add_argument("--train", action="store_true", help="Train a new model for this run.")
+args = parser.parse_args()
+
+TRAINING_NEW_MODEL = args.train
 
 def main():
     """
