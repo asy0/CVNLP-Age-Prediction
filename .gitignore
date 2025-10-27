@@ -17,3 +17,6 @@ __pycache__/
 # OS metadata
 .DS_Store
 Thumbs.db
+
+# artifacts
+age_prediction.log
