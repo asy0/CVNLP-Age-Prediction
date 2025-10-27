@@ -41,7 +41,7 @@ def setup_logging() -> logging.Logger:
         format=LOG_FORMAT,
         handlers=[
             logging.StreamHandler(),
-            logging.FileHandler(PROJECT_ROOT / "age_prediction.log")
+            logging.FileHandler(ARTIFACTS_DIR / "age_prediction.log")
         ]
     )
     return logging.getLogger(__name__)
