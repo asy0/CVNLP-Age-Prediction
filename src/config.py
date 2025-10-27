@@ -13,9 +13,9 @@ FINAL_MODEL_PATH = ARTIFACTS_DIR / "final_model_version.keras"
 
 # Model configuration
 INPUT_SHAPE: Tuple[int, int, int] = (128, 128, 3)
-BATCH_SIZE: int = 128  # Very large batch for maximum speed
-EPOCHS: int = 4  # Minimal for ultra-fast training
-LEARNING_RATE: float = 0.0005  # Reduced for stability
+BATCH_SIZE: int = 32
+EPOCHS: int = 20
+LEARNING_RATE: float = 0.001
 MIN_LEARNING_RATE: float = 1e-6
 
 # Data configuration
@@ -26,7 +26,7 @@ SEED: int = 42
 AGE_BINS = [0, 10, 20, 30, 40, 50, 60, 70, 120]
 
 # Training configuration
-EARLY_STOPPING_PATIENCE: int = 2  # Minimal patience for 4 epochs
+EARLY_STOPPING_PATIENCE: int = 6
 LR_REDUCTION_PATIENCE: int = 2
 LR_REDUCTION_FACTOR: float = 0.5
 
