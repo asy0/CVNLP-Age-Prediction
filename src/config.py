@@ -16,7 +16,7 @@ INPUT_SHAPE: Tuple[int, int, int] = (128, 128, 3)
 BATCH_SIZE: int = 32
 EPOCHS: int = 20
 LEARNING_RATE: float = 0.001
-MIN_LEARNING_RATE: float = 1e-6
+MIN_LEARNING_RATE: float = 1e-5
 
 # Data configuration
 IMG_SIZE: Tuple[int, int] = (128, 128)
