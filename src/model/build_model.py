@@ -14,58 +14,29 @@ def build_model() -> tf.keras.Model:
     """
     model = models.Sequential([
         layers.Input(shape=INPUT_SHAPE),
-        
-        # First convolutional block with batch normalization
-        layers.Conv2D(32, kernel_size=(3, 3), padding='same', activation='relu'),
-        layers.BatchNormalization(),
-        layers.Conv2D(32, kernel_size=(3, 3), padding='same', activation='relu'),
-        layers.MaxPooling2D(pool_size=(2, 2)),
-        layers.Dropout(0.25),
-        
-        # Second convolutional block
-        layers.Conv2D(64, kernel_size=(3, 3), padding='same', activation='relu'),
-        layers.BatchNormalization(),
-        layers.Conv2D(64, kernel_size=(3, 3), padding='same', activation='relu'),
-        layers.MaxPooling2D(pool_size=(2, 2)),
-        layers.Dropout(0.25),
-        
-        # Third convolutional block
-        layers.Conv2D(128, kernel_size=(3, 3), padding='same', activation='relu'),
-        layers.BatchNormalization(),
-        layers.Conv2D(128, kernel_size=(3, 3), padding='same', activation='relu'),
-        layers.MaxPooling2D(pool_size=(2, 2)),
-        layers.Dropout(0.25),
-        
-        # Fourth convolutional block
-        layers.Conv2D(256, kernel_size=(3, 3), padding='same', activation='relu'),
-        layers.BatchNormalization(),
-        layers.Conv2D(256, kernel_size=(3, 3), padding='same', activation='relu'),
-        layers.MaxPooling2D(pool_size=(2, 2)),
-        layers.Dropout(0.25),
-        
-        # Global Average Pooling
-        layers.GlobalAveragePooling2D(),
-        
-        # Dense layers - simplified for faster training
+
+        layers.Conv2D(32, (3, 3), activation='relu'),
+        layers.MaxPooling2D((2, 2)),
+
+        layers.Conv2D(64, (3, 3), activation='relu'),
+        layers.MaxPooling2D((2, 2)),
+
+        layers.Conv2D(128, (3, 3), activation='relu'),
+        layers.MaxPooling2D((2, 2)),
+
+        layers.Flatten(),
+
         layers.Dense(128, activation='relu'),
-        layers.BatchNormalization(),
-        layers.Dropout(0.3),
-        
+        layers.Dropout(0.5),
+
         layers.Dense(64, activation='relu'),
-        layers.Dropout(0.2),
-        
-        # Output layer
-        layers.Dense(1, activation='linear', name="age_prediction")
+        layers.Dropout(0.5),
+
+        layers.Dense(1, activation='linear', name='age_output')
     ])
 
-    # Compile with improved optimizer settings
     model.compile(
-        optimizer=tf.keras.optimizers.Adam(
-            learning_rate=LEARNING_RATE,
-            beta_1=0.9,
-            beta_2=0.999,
-            epsilon=1e-07
-        ),
+        optimizer=tf.keras.optimizers.Adam(learning_rate=LEARNING_RATE),
         loss='mae',
         metrics=['mae', 'mse']
     )
