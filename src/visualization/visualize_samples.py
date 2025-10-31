@@ -8,7 +8,7 @@ from pathlib import Path
 def show_samples(image_paths, n):
     """
     Display random sample images from the dataset.
-    
+
     Args:
         image_paths: List of image file paths
         n: Number of samples to display
